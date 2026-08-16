@@ -1,4 +1,4 @@
-// Commander Lab v0.3.2 — iPhone modal scroll lock + hand swipe navigation
+// Commander Lab v0.3.4 — iPhone modal scroll lock + visible hand swipe navigation
 (() => {
   let lockedScrollY = 0;
   let locked = false;
@@ -65,6 +65,32 @@
     return true;
   }
 
+  function ensureHandNav(dialog){
+    let nav = document.getElementById('handSwipeNav');
+    if(nav) return nav;
+    nav = document.createElement('div');
+    nav.id = 'handSwipeNav';
+    nav.className = 'hand-swipe-nav';
+    nav.innerHTML = `
+      <button type="button" class="hand-nav-arrow hand-nav-left" aria-label="Previous card">‹</button>
+      <div class="hand-swipe-label">Swipe</div>
+      <button type="button" class="hand-nav-arrow hand-nav-right" aria-label="Next card">›</button>`;
+    dialog.appendChild(nav);
+    nav.querySelector('.hand-nav-left').onclick = event => {
+      event.preventDefault();event.stopPropagation();moveWithinHand(-1);
+    };
+    nav.querySelector('.hand-nav-right').onclick = event => {
+      event.preventDefault();event.stopPropagation();moveWithinHand(1);
+    };
+    return nav;
+  }
+
+  function updateHandNav(dialog){
+    const nav = ensureHandNav(dialog);
+    const show = typeof state !== 'undefined' && state.selected?.zone === 'hand' && handCards().length > 1;
+    nav.classList.toggle('show', !!show);
+  }
+
   function applyFix(){
     const dialog = document.getElementById('cardDialog');
     const back = document.getElementById('closeModal');
@@ -72,9 +98,11 @@
 
     back.textContent = 'Back';
     back.setAttribute('aria-label','Back to game');
+    ensureHandNav(dialog);
 
     const nativeShowModal = dialog.showModal.bind(dialog);
     dialog.showModal = function(){
+      updateHandNav(dialog);
       // Card-to-card hand swipes refresh this same open dialog instead of
       // closing/reopening it, which avoids flicker and preserves game scroll.
       if(dialog.open){
@@ -86,7 +114,10 @@
       dialog.scrollTop = 0;
     };
 
-    dialog.addEventListener('close', unlockBackground);
+    dialog.addEventListener('close', () => {
+      const nav=document.getElementById('handSwipeNav');if(nav)nav.classList.remove('show');
+      unlockBackground();
+    });
     dialog.addEventListener('cancel', () => requestAnimationFrame(unlockBackground));
 
     dialog.addEventListener('click', event => {
