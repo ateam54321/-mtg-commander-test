@@ -1,7 +1,8 @@
-// Commander Lab v0.3.0 — first reusable card-effect slice
+// Commander Lab v0.3.1 — reusable targeting/effect slice: Eternal Witness + Beast Within
 (() => {
   const previousRender = renderGame;
   let knownBattlefield = new Set();
+  let knownGraveyard = new Set();
   let effectQueue = [];
   let pickerOpen = false;
   let pickerScrollY = 0;
@@ -135,9 +136,77 @@
     });
   }
 
+  function beastTokenImage(){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="488" height="680" viewBox="0 0 488 680">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#153f2d"/><stop offset="1" stop-color="#071d15"/></linearGradient></defs>
+      <rect width="488" height="680" rx="32" fill="#09110d"/><rect x="18" y="18" width="452" height="644" rx="24" fill="url(#g)" stroke="#6fd09a" stroke-width="8"/>
+      <circle cx="244" cy="280" r="126" fill="#2b7650" opacity=".55"/><path d="M125 345c25-84 67-145 119-184 49 43 91 100 119 184-34-30-68-44-101-43-13 0-25 2-37 6-35-10-68 2-100 37z" fill="#c7e7cc" opacity=".9"/>
+      <text x="42" y="82" fill="#e8f7ed" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="38" font-weight="800">BEAST</text>
+      <text x="42" y="505" fill="#d6eadb" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="25">Token Creature — Beast</text>
+      <text x="374" y="620" text-anchor="middle" fill="#f3fff6" font-family="-apple-system,BlinkMacSystemFont,Arial" font-size="54" font-weight="900">3/3</text>
+    </svg>`;
+    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  }
+
+  function createBeastToken(){
+    return {
+      id:`commander-lab-beast-token-${Date.now()}-${Math.random()}`,
+      name:'Beast Token',
+      type_line:'Token Creature — Beast',
+      oracle_text:'',
+      mana_cost:'',
+      power:'3',
+      toughness:'3',
+      colors:['G'],
+      color_identity:['G'],
+      keywords:[],
+      image_uris:{normal:beastTokenImage()},
+      _instance:`token-beast-${Date.now()}-${Math.random()}`,
+      _tapped:false,
+      _isToken:true,
+      _enteredTurn:state.turn,
+      _summoningSick:true
+    };
+  }
+
+  function resolveBeastWithin(spell){
+    // Until opponent permanents exist in the app, the supported target pool is your battlefield.
+    // Commander replacement handling is a later rules slice, so commanders are excluded for now.
+    const candidates = state.battlefield.filter(card => !card?._isCommander);
+    if(!candidates.length){
+      log('[Effect] Beast Within resolved with no currently supported permanent target.');
+      return;
+    }
+
+    chooseTarget({
+      kicker:'Beast Within · Spell',
+      title:'Choose a permanent to destroy',
+      prompt:'Destroy target permanent. Its controller creates a 3/3 green Beast creature token.',
+      cards:candidates,
+      foot:`${candidates.length} supported target${candidates.length===1?'':'s'} · tap one to destroy it`,
+      onChoose(target){
+        const index = state.battlefield.findIndex(c => cardKey(c) === cardKey(target));
+        if(index < 0) return false;
+        const [destroyed] = state.battlefield.splice(index,1);
+        if(!destroyed._isToken) state.graveyard.push(destroyed);
+        const beast = createBeastToken();
+        state.battlefield.push(beast);
+        log(`[Effect] Beast Within destroyed ${destroyed.name}. You created a 3/3 green Beast token.`);
+        renderGame();
+        return true;
+      }
+    });
+  }
+
   function handleEnters(card){
     if(card?.name === 'Eternal Witness'){
       queueEffect(() => resolveEternalWitness(card));
+    }
+  }
+
+  function handleGraveyardArrival(card){
+    if(card?.name === 'Beast Within'){
+      queueEffect(() => resolveBeastWithin(card));
     }
   }
 
@@ -151,9 +220,24 @@
     knownBattlefield = next;
   }
 
+  function scanGraveyard(){
+    const next = new Set();
+    state.graveyard.forEach((card,index) => {
+      const key = cardKey(card,index);
+      next.add(key);
+      if(!knownGraveyard.has(key)) handleGraveyardArrival(card);
+    });
+    knownGraveyard = next;
+  }
+
+  function scanZones(){
+    scanBattlefield();
+    scanGraveyard();
+  }
+
   renderGame = function(){
     previousRender();
-    setTimeout(scanBattlefield,0);
+    setTimeout(scanZones,0);
   };
 
   const startButton = document.getElementById('startBtn');
@@ -161,12 +245,14 @@
     const currentStart = startButton.onclick;
     startButton.onclick = function(event){
       knownBattlefield = new Set();
+      knownGraveyard = new Set();
       effectQueue = [];
       pickerOpen = false;
       if(typeof currentStart === 'function') return currentStart.call(this,event);
     };
   }
 
-  // Sync with any battlefield state that already exists when this layer loads.
-  setTimeout(scanBattlefield,0);
+  // Sync with any state already present when this layer loads, without treating it as a new effect event.
+  knownBattlefield = new Set(state.battlefield.map((card,index)=>cardKey(card,index)));
+  knownGraveyard = new Set(state.graveyard.map((card,index)=>cardKey(card,index)));
 })();
