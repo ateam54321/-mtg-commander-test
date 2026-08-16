@@ -1,7 +1,10 @@
-// Commander Lab v0.1.3 — iPhone card modal + background scroll lock
+// Commander Lab v0.3.2 — iPhone modal scroll lock + hand swipe navigation
 (() => {
   let lockedScrollY = 0;
   let locked = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let trackingSwipe = false;
 
   function lockBackground(){
     if(locked) return;
@@ -34,6 +37,34 @@
     requestAnimationFrame(() => window.scrollTo(0, lockedScrollY));
   }
 
+  function handCards(){
+    if(typeof state === 'undefined' || !Array.isArray(state.hand)) return [];
+    return state.hand;
+  }
+
+  function selectedHandCard(){
+    if(typeof state === 'undefined' || state.selected?.zone !== 'hand') return null;
+    return state.selected.c || null;
+  }
+
+  function sameCard(a,b){
+    if(!a || !b) return false;
+    if(a._instance && b._instance) return a._instance === b._instance;
+    return a === b || (a.id && b.id && a.id === b.id);
+  }
+
+  function moveWithinHand(direction){
+    const cards = handCards();
+    const current = selectedHandCard();
+    if(cards.length < 2 || !current || typeof openCard !== 'function') return false;
+
+    let index = cards.findIndex(card => sameCard(card,current));
+    if(index < 0) return false;
+    index = (index + direction + cards.length) % cards.length;
+    openCard(cards[index],'hand');
+    return true;
+  }
+
   function applyFix(){
     const dialog = document.getElementById('cardDialog');
     const back = document.getElementById('closeModal');
@@ -44,6 +75,12 @@
 
     const nativeShowModal = dialog.showModal.bind(dialog);
     dialog.showModal = function(){
+      // Card-to-card hand swipes refresh this same open dialog instead of
+      // closing/reopening it, which avoids flicker and preserves game scroll.
+      if(dialog.open){
+        dialog.scrollTop = 0;
+        return;
+      }
       lockBackground();
       nativeShowModal();
       dialog.scrollTop = 0;
@@ -55,6 +92,34 @@
     dialog.addEventListener('click', event => {
       if(event.target === dialog) dialog.close();
     });
+
+    dialog.addEventListener('touchstart', event => {
+      if(event.touches.length !== 1 || state?.selected?.zone !== 'hand'){
+        trackingSwipe = false;
+        return;
+      }
+      if(event.target.closest('button')){
+        trackingSwipe = false;
+        return;
+      }
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+      trackingSwipe = true;
+    },{passive:true});
+
+    dialog.addEventListener('touchend', event => {
+      if(!trackingSwipe || !event.changedTouches.length){
+        trackingSwipe = false;
+        return;
+      }
+      trackingSwipe = false;
+      const dx = event.changedTouches[0].clientX - touchStartX;
+      const dy = event.changedTouches[0].clientY - touchStartY;
+      if(Math.abs(dx) < 45 || Math.abs(dx) <= Math.abs(dy) * 1.25) return;
+
+      // Swipe left = next card; swipe right = previous card.
+      moveWithinHand(dx < 0 ? 1 : -1);
+    },{passive:true});
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', applyFix);
