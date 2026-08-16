@@ -1,4 +1,4 @@
-const CACHE='commander-lab-v0.1.2';
+const CACHE='commander-lab-v0.1.3';
 const SHELL=['./manifest.json','./icon.svg','./modal-fix.css','./modal-fix.js'];
 
 self.addEventListener('install',event=>{
@@ -17,11 +17,12 @@ async function patchedNavigation(request){
   const response=await fetch(request,{cache:'no-store'});
   let html=await response.text();
   if(!html.includes('modal-fix.css')){
-    html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=012"></head>');
+    html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=013"></head>');
   }
   if(!html.includes('modal-fix.js')){
-    html=html.replace('</body>','<script src="./modal-fix.js?v=012"></script></body>');
+    html=html.replace('</body>','<script src="./modal-fix.js?v=013"></script></body>');
   }
+  html=html.replace('MTG playtest prototype · v0.1.1','MTG playtest prototype · v0.1.3');
   const headers=new Headers(response.headers);
   headers.delete('content-length');
   headers.delete('content-encoding');
