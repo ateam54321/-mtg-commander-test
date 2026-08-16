@@ -1,4 +1,4 @@
-const CACHE='commander-lab-v0.3.0';
+const CACHE='commander-lab-v0.3.1';
 const SHELL=['./manifest.json','./icon.svg','./modal-fix.css','./modal-fix.js','./rules-v02.css','./rules-v02.js','./effects-v03.css','./effects-v03.js'];
 
 self.addEventListener('install',event=>{
@@ -16,13 +16,13 @@ self.addEventListener('activate',event=>{
 async function patchedNavigation(request){
   const response=await fetch(request,{cache:'no-store'});
   let html=await response.text();
-  if(!html.includes('modal-fix.css'))html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=030"></head>');
-  if(!html.includes('rules-v02.css'))html=html.replace('</head>','<link rel="stylesheet" href="./rules-v02.css?v=030"></head>');
-  if(!html.includes('effects-v03.css'))html=html.replace('</head>','<link rel="stylesheet" href="./effects-v03.css?v=030"></head>');
-  if(!html.includes('modal-fix.js'))html=html.replace('</body>','<script src="./modal-fix.js?v=030"></script></body>');
-  if(!html.includes('rules-v02.js'))html=html.replace('</body>','<script src="./rules-v02.js?v=030"></script></body>');
-  if(!html.includes('effects-v03.js'))html=html.replace('</body>','<script src="./effects-v03.js?v=030"></script></body>');
-  html=html.replace(/MTG playtest prototype · v0\.[0-9]+\.[0-9]+/g,'MTG playtest prototype · v0.3.0');
+  if(!html.includes('modal-fix.css'))html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=031"></head>');
+  if(!html.includes('rules-v02.css'))html=html.replace('</head>','<link rel="stylesheet" href="./rules-v02.css?v=031"></head>');
+  if(!html.includes('effects-v03.css'))html=html.replace('</head>','<link rel="stylesheet" href="./effects-v03.css?v=031"></head>');
+  if(!html.includes('modal-fix.js'))html=html.replace('</body>','<script src="./modal-fix.js?v=031"></script></body>');
+  if(!html.includes('rules-v02.js'))html=html.replace('</body>','<script src="./rules-v02.js?v=031"></script></body>');
+  if(!html.includes('effects-v03.js'))html=html.replace('</body>','<script src="./effects-v03.js?v=031"></script></body>');
+  html=html.replace(/MTG playtest prototype · v0\.[0-9]+\.[0-9]+/g,'MTG playtest prototype · v0.3.1');
   const headers=new Headers(response.headers);
   headers.delete('content-length');headers.delete('content-encoding');
   const patched=new Response(html,{status:response.status,statusText:response.statusText,headers});
