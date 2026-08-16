@@ -1,4 +1,4 @@
-// Commander Lab v0.3.3 — reusable targeting/effect slice + commander-slot test spell support
+// Commander Lab v0.3.4 — reusable targeting/effect slice: Eternal Witness + Beast Within
 (() => {
   const previousRender = renderGame;
   let knownBattlefield = new Set();
@@ -9,11 +9,6 @@
 
   function cardKey(card, index=0){
     return card?._instance || `${card?.name || 'card'}-${index}`;
-  }
-
-  function isInstantOrSorcery(card){
-    const type = card?.type_line || '';
-    return type.includes('Instant') || type.includes('Sorcery');
   }
 
   function ensurePicker(){
@@ -176,7 +171,7 @@
 
   function resolveBeastWithin(spell){
     // Until opponent permanents exist in the app, the supported target pool is your battlefield.
-    // Commander replacement handling is a later rules slice, so actual commanders are excluded.
+    // Commander replacement handling is a later rules slice, so commanders are excluded for now.
     const candidates = state.battlefield.filter(card => !card?._isCommander);
     if(!candidates.length){
       log('[Effect] Beast Within resolved with no currently supported permanent target.');
@@ -203,37 +198,13 @@
     });
   }
 
-  function resolveCommanderSlotTestSpell(card){
-    const index = state.battlefield.findIndex(c => cardKey(c) === cardKey(card));
-    if(index < 0) return;
-
-    const [spell] = state.battlefield.splice(index,1);
-    spell._testSlotSpellEffectHandled = true;
-    state.graveyard.push(spell);
-    log(`[Test] ${spell.name} was cast from the commander slot as a test spell and moved to the graveyard.`);
-    renderGame();
-
-    if(spell.name === 'Beast Within'){
-      resolveBeastWithin(spell);
-    }
-  }
-
   function handleEnters(card){
-    // During development we allow an instant/sorcery to be placed in the commander slot
-    // as a shortcut for testing. The core commander layer currently puts everything it
-    // casts onto the battlefield, so correct that here and resolve it as a spell instead.
-    if(card?._isCommander && isInstantOrSorcery(card)){
-      queueEffect(() => resolveCommanderSlotTestSpell(card));
-      return;
-    }
-
     if(card?.name === 'Eternal Witness'){
       queueEffect(() => resolveEternalWitness(card));
     }
   }
 
   function handleGraveyardArrival(card){
-    if(card?._testSlotSpellEffectHandled) return;
     if(card?.name === 'Beast Within'){
       queueEffect(() => resolveBeastWithin(card));
     }
