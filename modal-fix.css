@@ -1,0 +1,36 @@
+/* Commander Lab v0.1.2 — iPhone card modal hotfix */
+#cardDialog{
+  width:min(92vw,430px);
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+  overflow-y:auto !important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+#cardDialog .modal-img{
+  max-height:46dvh;
+}
+#cardDialog .modal-body{
+  padding-bottom:12px;
+}
+#cardDialog .modal-text{
+  max-height:none;
+  overflow:visible;
+}
+#cardDialog .modal-actions{
+  margin-bottom:8px;
+}
+#cardDialog #closeModal{
+  position:sticky;
+  bottom:8px;
+  z-index:20;
+  width:100%;
+  margin-top:10px;
+  min-height:48px;
+  background:#35445d;
+  color:#f4f7fb;
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 -8px 24px rgba(14,21,31,.9);
+}
+@media(max-height:760px){
+  #cardDialog .modal-img{max-height:38dvh}
+}
