@@ -1,0 +1,131 @@
+/* Commander Lab v0.3.5 — compact battlefield land stacks */
+.land-stack-battlefield{
+  position:relative;
+  width:100%;
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  isolation:isolate;
+}
+.land-stack-battlefield .land-stack-representative{
+  position:relative;
+  z-index:3;
+  width:100%;
+  margin:0;
+}
+.land-stack-shadow{
+  position:absolute;
+  inset:0;
+  border:1px solid rgba(110,154,219,.55);
+  border-radius:9px;
+  background:#101a28;
+  pointer-events:none;
+}
+.land-stack-shadow.shadow-one{transform:translate(5px,-5px);z-index:2;opacity:.78}
+.land-stack-shadow.shadow-two{transform:translate(10px,-10px);z-index:1;opacity:.5}
+.land-stack-count{
+  position:absolute;
+  z-index:8;
+  top:-13px;
+  right:-12px;
+  min-width:36px;
+  height:36px;
+  padding:0 9px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#edf5ff;
+  color:#101722;
+  border:3px solid #273d5d;
+  box-shadow:0 5px 16px rgba(0,0,0,.45);
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+}
+.land-stack-state{
+  position:absolute;
+  z-index:8;
+  left:5px;
+  bottom:5px;
+  padding:4px 7px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(5,10,17,.88);
+  color:#a9f2c9;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.08em;
+  pointer-events:none;
+}
+.land-stack-state.tapped{color:#f4b8d8}
+
+#landStackOverlay{
+  position:fixed;
+  inset:0;
+  z-index:10010;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  padding:18px 14px calc(18px + env(safe-area-inset-bottom));
+  background:rgba(2,6,11,.82);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+}
+#landStackOverlay.open{display:flex}
+.land-stack-panel{
+  width:min(100%,520px);
+  max-height:82dvh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:#0d1623;
+  border:1px solid #496b9c;
+  border-radius:24px;
+  box-shadow:0 28px 70px rgba(0,0,0,.62);
+}
+.land-stack-head{padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.land-stack-kicker{font-size:12px;font-weight:900;letter-spacing:.16em;color:#72d7ff}
+.land-stack-head h3{margin:5px 0 5px;font-size:25px;color:#edf4ff}
+.land-stack-head p{margin:0;color:#aeb8c8;font-size:14px;line-height:1.4}
+.land-stack-grid{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  padding:14px 16px;
+}
+.land-stack-item{
+  min-width:0;
+  appearance:none;
+  border:1px solid #38567d;
+  border-radius:16px;
+  background:#101b2a;
+  padding:8px;
+  color:#e7eef8;
+  text-align:left;
+}
+.land-stack-item-art{display:flex;justify-content:center;align-items:center;min-height:0}
+.land-stack-item img{display:block;width:100%;border-radius:10px}
+.land-stack-item.is-tapped img{transform:rotate(90deg) scale(.72)}
+.land-stack-item-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:8px}
+.land-stack-item-meta strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.land-stack-status{flex:0 0 auto;padding:3px 6px;border-radius:999px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.land-stack-status.ready{background:#173e2c;color:#aaf1c7}
+.land-stack-status.tapped{background:#4b2940;color:#ffd2e7}
+.land-stack-close{
+  margin:0 16px 16px;
+  min-height:50px;
+  border-radius:14px;
+  border:1px solid #496b9c;
+  background:#263852;
+  color:#eef5ff;
+  font-size:17px;
+  font-weight:800;
+}
+@media(max-width:420px){
+  .land-stack-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:12px}
+  .land-stack-count{top:-10px;right:-8px;min-width:32px;height:32px;font-size:17px}
+}
