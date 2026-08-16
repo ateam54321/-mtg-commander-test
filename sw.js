@@ -1,5 +1,5 @@
-const CACHE='commander-lab-v0.3.5';
-const SHELL=['./manifest.json','./icon.svg','./modal-fix.css','./modal-fix.js','./rules-v02.css','./rules-v02.js','./effects-v03.css','./effects-v03.js','./test-tools-v034.css','./test-tools-v034.js','./land-stacks-v035.css','./land-stacks-v035.js'];
+const CACHE='commander-lab-v0.3.6';
+const SHELL=['./manifest.json','./icon.svg','./modal-fix.css','./modal-fix.js','./rules-v02.css','./rules-v02.js','./effects-v03.css','./effects-v03.js','./test-tools-v034.css','./test-tools-v034.js','./land-stacks-v035.css','./land-stacks-v035.js','./manual-actions-v036.js'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
@@ -16,17 +16,18 @@ self.addEventListener('activate',event=>{
 async function patchedNavigation(request){
   const response=await fetch(request,{cache:'no-store'});
   let html=await response.text();
-  if(!html.includes('modal-fix.css'))html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=035"></head>');
-  if(!html.includes('rules-v02.css'))html=html.replace('</head>','<link rel="stylesheet" href="./rules-v02.css?v=035"></head>');
-  if(!html.includes('effects-v03.css'))html=html.replace('</head>','<link rel="stylesheet" href="./effects-v03.css?v=035"></head>');
-  if(!html.includes('test-tools-v034.css'))html=html.replace('</head>','<link rel="stylesheet" href="./test-tools-v034.css?v=035"></head>');
-  if(!html.includes('land-stacks-v035.css'))html=html.replace('</head>','<link rel="stylesheet" href="./land-stacks-v035.css?v=035"></head>');
-  if(!html.includes('modal-fix.js'))html=html.replace('</body>','<script src="./modal-fix.js?v=035"></script></body>');
-  if(!html.includes('rules-v02.js'))html=html.replace('</body>','<script src="./rules-v02.js?v=035"></script></body>');
-  if(!html.includes('effects-v03.js'))html=html.replace('</body>','<script src="./effects-v03.js?v=035"></script></body>');
-  if(!html.includes('test-tools-v034.js'))html=html.replace('</body>','<script src="./test-tools-v034.js?v=035"></script></body>');
-  if(!html.includes('land-stacks-v035.js'))html=html.replace('</body>','<script src="./land-stacks-v035.js?v=035"></script></body>');
-  html=html.replace(/MTG playtest prototype · v0\.[0-9]+\.[0-9]+/g,'MTG playtest prototype · v0.3.5');
+  if(!html.includes('modal-fix.css'))html=html.replace('</head>','<link rel="stylesheet" href="./modal-fix.css?v=036"></head>');
+  if(!html.includes('rules-v02.css'))html=html.replace('</head>','<link rel="stylesheet" href="./rules-v02.css?v=036"></head>');
+  if(!html.includes('effects-v03.css'))html=html.replace('</head>','<link rel="stylesheet" href="./effects-v03.css?v=036"></head>');
+  if(!html.includes('test-tools-v034.css'))html=html.replace('</head>','<link rel="stylesheet" href="./test-tools-v034.css?v=036"></head>');
+  if(!html.includes('land-stacks-v035.css'))html=html.replace('</head>','<link rel="stylesheet" href="./land-stacks-v035.css?v=036"></head>');
+  if(!html.includes('modal-fix.js'))html=html.replace('</body>','<script src="./modal-fix.js?v=036"></script></body>');
+  if(!html.includes('rules-v02.js'))html=html.replace('</body>','<script src="./rules-v02.js?v=036"></script></body>');
+  if(!html.includes('effects-v03.js'))html=html.replace('</body>','<script src="./effects-v03.js?v=036"></script></body>');
+  if(!html.includes('test-tools-v034.js'))html=html.replace('</body>','<script src="./test-tools-v034.js?v=036"></script></body>');
+  if(!html.includes('land-stacks-v035.js'))html=html.replace('</body>','<script src="./land-stacks-v035.js?v=036"></script></body>');
+  if(!html.includes('manual-actions-v036.js'))html=html.replace('</body>','<script src="./manual-actions-v036.js?v=036"></script></body>');
+  html=html.replace(/MTG playtest prototype · v0\.[0-9]+\.[0-9]+/g,'MTG playtest prototype · v0.3.6');
   const headers=new Headers(response.headers);
   headers.delete('content-length');headers.delete('content-encoding');
   const patched=new Response(html,{status:response.status,statusText:response.statusText,headers});
