@@ -1,0 +1,19 @@
+{
+  "name": "Commander Lab — MTG Playtester",
+  "short_name": "Commander Lab",
+  "description": "An unofficial mobile Commander deck playtesting prototype.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080b10",
+  "theme_color": "#0b0f14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
