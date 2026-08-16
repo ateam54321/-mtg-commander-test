@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0b0f14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Commander Lab" />
+  <link rel="manifest" href="./manifest.json" />
+  <title>Commander Lab</title>
+  <style>
+    :root{--bg:#080b10;--panel:#111722;--panel2:#182131;--line:#263247;--text:#f4f7fb;--muted:#9aa8bb;--green:#39d98a;--red:#ff6577;--blue:#62a8ff;--gold:#ffd166;--shadow:0 16px 50px rgba(0,0,0,.35)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;background:radial-gradient(circle at 50% -20%,#182338 0,#080b10 44%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;min-height:100%;overscroll-behavior:none}
+    body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    button,textarea,input{font:inherit}
+    button{border:0;cursor:pointer}
+    .app{max-width:900px;margin:0 auto;min-height:100vh}
+    header{position:sticky;top:0;z-index:20;padding:14px 16px 12px;background:rgba(8,11,16,.86);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.06)}
+    .brand{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand h1{font-size:21px;margin:0;font-weight:800;letter-spacing:-.02em}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+    .pill{border:1px solid var(--line);background:var(--panel);padding:8px 11px;border-radius:999px;color:var(--muted);font-size:12px;font-weight:700}
+    main{padding:16px 14px 90px}
+    .card{background:linear-gradient(180deg,rgba(24,33,49,.96),rgba(17,23,34,.96));border:1px solid rgba(255,255,255,.07);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+    .section{padding:16px}.section h2{font-size:16px;margin:0 0 5px}.section p{font-size:13px;color:var(--muted);line-height:1.45;margin:0 0 13px}
+    textarea{width:100%;min-height:180px;resize:vertical;border-radius:14px;border:1px solid var(--line);background:#0b111a;color:var(--text);padding:13px;outline:none;font-size:14px;line-height:1.35}
+    textarea:focus{border-color:#4678b8;box-shadow:0 0 0 3px rgba(98,168,255,.12)}
+    .row{display:flex;gap:9px;flex-wrap:wrap}.btn{background:var(--blue);color:#07101d;padding:11px 14px;border-radius:12px;font-weight:800;min-height:44px}.btn.secondary{background:#27364d;color:var(--text)}.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}.btn.danger{background:var(--red);color:#21070b}.btn.green{background:var(--green);color:#052116}.btn:disabled{opacity:.45;cursor:not-allowed}
+    .status{font-size:12px;color:var(--muted);margin-top:10px;min-height:18px}.status.good{color:var(--green)}.status.bad{color:var(--red)}
+    #game{display:none}.game-top{display:grid;grid-template-columns:1fr 1fr;gap:10px}.life,.turnbox{padding:14px;border-radius:17px;background:var(--panel);border:1px solid var(--line)}
+    .life-label,.tiny{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.life-value{font-size:42px;line-height:1;font-weight:900;margin:6px 0 9px}.life-controls{display:flex;gap:8px}.round{width:42px;height:36px;border-radius:10px;background:#25334a;color:var(--text);font-weight:900;font-size:20px}
+    .turn-num{font-size:28px;font-weight:900;margin-top:5px}.toolbar{display:flex;gap:8px;overflow-x:auto;padding:11px 0 2px;scrollbar-width:none}.toolbar::-webkit-scrollbar{display:none}.tool{white-space:nowrap;background:#1a2638;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font-size:12px;font-weight:800}
+    .zones{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:11px 0}.zone-counter{background:#101722;border:1px solid var(--line);border-radius:12px;padding:9px 6px;text-align:center}.zone-counter strong{display:block;font-size:18px}.zone-counter span{font-size:10px;color:var(--muted)}
+    .zone{margin-top:14px}.zone-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.zone-head h3{font-size:14px;margin:0}.zone-head span{font-size:11px;color:var(--muted)}
+    .strip{display:flex;gap:8px;overflow-x:auto;min-height:148px;padding:2px 2px 8px;scrollbar-width:none}.strip::-webkit-scrollbar{display:none}.battlefield{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;min-height:125px;padding:2px}
+    .mtg-card{position:relative;flex:0 0 98px;aspect-ratio:488/680;border-radius:9px;overflow:hidden;background:#1d2634;border:1px solid rgba(255,255,255,.12);box-shadow:0 7px 17px rgba(0,0,0,.3);transition:.2s transform,.2s opacity}.battlefield .mtg-card{width:100%;flex:auto}.mtg-card img{width:100%;height:100%;object-fit:cover;display:block}.mtg-card.tapped{transform:rotate(90deg) scale(.78);z-index:1}.mtg-card .badge{position:absolute;right:4px;top:4px;background:rgba(0,0,0,.72);font-size:9px;border-radius:6px;padding:3px 5px;font-weight:800}.empty{display:flex;align-items:center;justify-content:center;border:1px dashed #2b3a51;border-radius:14px;color:#65748a;font-size:12px;min-height:110px;width:100%;padding:20px}
+    .commander-slot{display:flex;align-items:center;gap:12px;padding:10px;background:#0d141f;border:1px solid var(--line);border-radius:15px;margin-top:10px}.commander-slot .mtg-card{flex-basis:65px}.commander-meta{min-width:0}.commander-meta strong{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.commander-meta small{color:var(--muted)}
+    .log{max-height:130px;overflow:auto;background:#0b111a;border:1px solid var(--line);padding:10px;border-radius:12px;font-size:11px;color:#aeb9c8;line-height:1.45}.log div+div{margin-top:5px}
+    dialog{width:min(92vw,430px);border:1px solid #33445f;border-radius:22px;padding:0;background:#0e151f;color:var(--text);box-shadow:0 30px 80px #000;overflow:hidden}dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(5px)}
+    .modal-img{width:100%;max-height:58vh;object-fit:contain;background:#05070a;display:block}.modal-body{padding:14px}.modal-title{font-size:17px;font-weight:900;margin-bottom:5px}.modal-text{font-size:12px;color:var(--muted);white-space:pre-line;line-height:1.4;max-height:100px;overflow:auto}.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.modal-actions .btn{padding:9px 8px;font-size:12px}.close{width:100%;margin-top:8px;background:#242e3d;color:var(--text)}
+    .loader{display:none;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:10px}.spinner{width:15px;height:15px;border:2px solid #314057;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+    footer{color:#66758a;font-size:10px;line-height:1.5;text-align:center;padding:10px 22px 35px}
+    @media (min-width:600px){.battlefield{grid-template-columns:repeat(7,1fr)}.mtg-card{flex-basis:112px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><div><h1>Commander Lab</h1><small>MTG playtest prototype · v0.1</small></div><div class="pill" id="modePill">DECK LAB</div></div>
+  </header>
+  <main>
+    <section id="deckLab" class="card section">
+      <h2>Paste your Commander deck</h2>
+      <p>Paste a normal decklist such as <b>1 Sol Ring</b>. Set/collector details are okay. Commander Lab will fetch the real card data and art from Scryfall.</p>
+      <textarea id="deckInput" spellcheck="false" placeholder="1 Llanowar Elves\n1 Sol Ring\n1 Beast Within\n...\n36 Forest"></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="loadBtn">Load Cards</button>
+        <button class="btn ghost" id="sampleBtn">Use Sample</button>
+        <button class="btn ghost" id="clearBtn">Clear</button>
+      </div>
+      <div class="loader" id="loader"><span class="spinner"></span><span id="loaderText">Loading cards…</span></div>
+      <div class="status" id="status">Waiting for a decklist.</div>
+      <div id="loadedSummary" style="display:none;margin-top:12px">
+        <div class="zones"><div class="zone-counter"><strong id="deckCount">0</strong><span>CARDS</span></div><div class="zone-counter"><strong id="uniqueCount">0</strong><span>UNIQUE</span></div><div class="zone-counter"><strong id="landCount">0</strong><span>LANDS</span></div><div class="zone-counter"><strong id="creatureCount">0</strong><span>CREATURES</span></div></div>
+        <div class="commander-slot" id="commanderPreview"><div class="empty" style="min-height:70px">Tap a loaded card below to choose your commander.</div></div>
+        <div class="zone"><div class="zone-head"><h3>Loaded cards</h3><span>Tap a card</span></div><div class="strip" id="deckPreview"></div></div>
+        <button class="btn green" id="startBtn" style="width:100%;margin-top:8px" disabled>Start 40-Life Test Game</button>
+      </div>
+    </section>
+
+    <section id="game" class="card section">
+      <div class="game-top">
+        <div class="life"><div class="life-label">Your life</div><div class="life-value" id="life">40</div><div class="life-controls"><button class="round" data-life="-1">−</button><button class="round" data-life="1">+</button><button class="round" data-life="-5">−5</button></div></div>
+        <div class="turnbox"><div class="tiny">Turn</div><div class="turn-num" id="turn">1</div><div class="tiny" id="phase">Main Phase</div><button class="tool" id="nextTurn" style="margin-top:12px;width:100%">Next Turn</button></div>
+      </div>
+      <div class="toolbar"><button class="tool" id="drawBtn">Draw</button><button class="tool" id="untapBtn">Untap All</button><button class="tool" id="shuffleBtn">Shuffle Library</button><button class="tool" id="backBtn">Deck Lab</button></div>
+      <div class="zones"><div class="zone-counter"><strong id="libraryCount">0</strong><span>LIBRARY</span></div><div class="zone-counter"><strong id="handCount">0</strong><span>HAND</span></div><div class="zone-counter"><strong id="graveCount">0</strong><span>GRAVE</span></div><div class="zone-counter"><strong id="exileCount">0</strong><span>EXILE</span></div></div>
+      <div id="gameCommander" class="commander-slot"></div>
+      <div class="zone"><div class="zone-head"><h3>Battlefield</h3><span>Tap card → actions</span></div><div class="battlefield" id="battlefield"></div></div>
+      <div class="zone"><div class="zone-head"><h3>Your Hand</h3><span id="handLabel">7 cards</span></div><div class="strip" id="hand"></div></div>
+      <div class="zone"><div class="zone-head"><h3>Game Log</h3><span>Local test session</span></div><div class="log" id="log"></div></div>
+    </section>
+    <footer>Card data and images are provided through Scryfall. Magic: The Gathering is property of Wizards of the Coast. Commander Lab is an unofficial fan playtesting prototype.</footer>
+  </main>
+</div>
+
+<dialog id="cardDialog">
+  <img class="modal-img" id="modalImg" alt="Card art" />
+  <div class="modal-body">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-text" id="modalText"></div>
+    <div class="modal-actions" id="modalActions"></div>
+    <button class="btn close" id="closeModal">Close</button>
+  </div>
+</dialog>
+
+<script>
+const $=s=>document.querySelector(s); const $$=s=>[...document.querySelectorAll(s)];
+const state={catalog:new Map(),deck:[],commander:null,library:[],hand:[],battlefield:[],graveyard:[],exile:[],life:40,turn:1,selected:null};
+const sample=`1 Goreclaw, Terror of Qal Sisma\n1 Sol Ring\n1 Arcane Signet\n1 Llanowar Elves\n1 Elvish Mystic\n1 Beast Whisperer\n1 Reclamation Sage\n1 Beast Within\n1 Cultivate\n1 Kodama's Reach\n1 Return of the Wildspeaker\n1 Garruk's Uprising\n1 Overwhelming Stampede\n1 End-Raze Forerunners\n1 Acidic Slime\n1 Eternal Witness\n1 Sakura-Tribe Elder\n1 Wood Elves\n1 Kogla, the Titan Ape\n1 Rampaging Baloths\n1 Terastodon\n1 Soul of the Harvest\n1 Bane of Progress\n1 Greater Good\n1 Guardian Project\n1 Heroic Intervention\n1 Nature's Claim\n1 Harmonize\n1 Rishkar's Expertise\n1 Castle Garenbrig\n1 Mosswort Bridge\n1 Myriad Landscape\n1 Rogue's Passage\n1 Reliquary Tower\n31 Forest`;
+
+function cleanName(raw){return raw.replace(/\s+\[[A-Z0-9]+\].*$/i,'').replace(/\s+\([A-Z0-9]+\)\s+\d+[a-z]?\s*$/i,'').replace(/\s+\*F\*.*$/i,'').trim()}
+function parseDeck(text){
+  const out=[]; let section='';
+  for(const raw of text.split(/\r?\n/)){
+    const line=raw.trim(); if(!line)continue;
+    if(!/^\d+\s+/.test(line)){section=line.toLowerCase();continue}
+    const m=line.match(/^(\d+)\s+(.+)$/); if(!m)continue;
+    const qty=Math.max(1,Math.min(100,parseInt(m[1],10))); const name=cleanName(m[2]);
+    if(name)out.push({qty,name,section});
+  }
+  return out;
+}
+async function scryfallCollection(names){
+  const result=[]; const unique=[...new Set(names)];
+  for(let i=0;i<unique.length;i+=75){
+    const ids=unique.slice(i,i+75).map(name=>({name}));
+    const r=await fetch('https://api.scryfall.com/cards/collection',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifiers:ids})});
+    if(!r.ok)throw new Error(`Scryfall request failed (${r.status})`); const j=await r.json(); result.push(...j.data);
+    if(j.not_found?.length) console.warn('Not found',j.not_found);
+    if(i+75<unique.length)await new Promise(res=>setTimeout(res,120));
+  }
+  return result;
+}
+function cardImage(c){return c.image_uris?.normal||c.card_faces?.[0]?.image_uris?.normal||''}
+function cardOracle(c){return c.oracle_text||c.card_faces?.map(f=>`${f.name}\n${f.oracle_text||''}`).join('\n\n')||''}
+function instance(card,n){return {...card,_instance:`${card.id}-${Date.now()}-${n}-${Math.random()}`,_tapped:false}}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function log(msg){const d=document.createElement('div');d.textContent=`T${state.turn} · ${msg}`;$('#log').prepend(d)}
+function setStatus(msg,type=''){const el=$('#status');el.textContent=msg;el.className=`status ${type}`}
+function setLoading(on,text='Loading cards…'){$('#loader').style.display=on?'flex':'none';$('#loaderText').textContent=text;$('#loadBtn').disabled=on}
+
+async function loadDeck(){
+  const parsed=parseDeck($('#deckInput').value); if(!parsed.length){setStatus('I could not find any “1 Card Name” lines.','bad');return}
+  const total=parsed.reduce((s,x)=>s+x.qty,0); if(total<2){setStatus('Add more cards before loading.','bad');return}
+  setLoading(true,`Fetching ${parsed.length} unique card names…`); setStatus('Contacting Scryfall…');
+  try{
+    const cards=await scryfallCollection(parsed.map(x=>x.name)); state.catalog.clear(); cards.forEach(c=>state.catalog.set(c.name.toLowerCase(),c));
+    state.deck=[]; let missing=[];
+    for(const row of parsed){const c=state.catalog.get(row.name.toLowerCase()); if(!c){missing.push(row.name);continue} for(let i=0;i<row.qty;i++)state.deck.push(instance(c,i))}
+    const commanderRow=parsed.find(x=>x.section.includes('commander')); if(commanderRow){state.commander=state.catalog.get(commanderRow.name.toLowerCase())||null}
+    $('#deckCount').textContent=state.deck.length; $('#uniqueCount').textContent=cards.length; $('#landCount').textContent=state.deck.filter(c=>c.type_line?.includes('Land')).length; $('#creatureCount').textContent=state.deck.filter(c=>c.type_line?.includes('Creature')).length;
+    $('#loadedSummary').style.display='block'; renderDeckPreview(); renderCommanderPreview(); $('#startBtn').disabled=!state.commander;
+    setStatus(`Loaded ${state.deck.length} cards${missing.length?` · ${missing.length} name(s) not found`:''}. ${state.commander?'Commander detected.':'Choose your commander below.'}`,missing.length?'':'good');
+  }catch(e){console.error(e);setStatus(`Could not load the deck: ${e.message}`,'bad')}finally{setLoading(false)}
+}
+function renderDeckPreview(){
+  const el=$('#deckPreview');el.innerHTML=''; const seen=new Set();
+  for(const c of state.deck){if(seen.has(c.id))continue;seen.add(c.id);el.append(cardNode(c,()=>openCard(c,'deck')))}
+}
+function renderCommanderPreview(){
+  const el=$('#commanderPreview'); if(!state.commander){el.innerHTML='<div class="empty" style="min-height:70px">Tap a loaded card below to choose your commander.</div>';return}
+  el.innerHTML=''; el.append(cardNode(state.commander,()=>openCard(state.commander,'commander'))); const m=document.createElement('div');m.className='commander-meta';m.innerHTML=`<strong>${state.commander.name}</strong><small>Commander selected</small>`;el.append(m)
+}
+function cardNode(c,onclick){const d=document.createElement('div');d.className=`mtg-card${c._tapped?' tapped':''}`;const img=document.createElement('img');img.src=cardImage(c);img.alt=c.name;img.loading='lazy';d.append(img);d.onclick=onclick;return d}
+function openCard(c,zone){
+  state.selected={c,zone};$('#modalImg').src=cardImage(c);$('#modalTitle').textContent=c.name;$('#modalText').textContent=`${c.type_line||''}\n${cardOracle(c)}`;const a=$('#modalActions');a.innerHTML='';
+  const add=(label,cls,fn)=>{const b=document.createElement('button');b.className=`btn ${cls||'secondary'}`;b.textContent=label;b.onclick=()=>{fn();$('#cardDialog').close()};a.append(b)};
+  if(zone==='deck'){add('Set Commander','green',()=>{state.commander=c;renderCommanderPreview();$('#startBtn').disabled=false;setStatus(`${c.name} selected as commander.`,'good')});}
+  if(zone==='hand'){add('Play','green',()=>move(c,state.hand,state.battlefield,'played'));add('Graveyard','secondary',()=>move(c,state.hand,state.graveyard,'discarded'));add('Exile','secondary',()=>move(c,state.hand,state.exile,'exiled'))}
+  if(zone==='battlefield'){add(c._tapped?'Untap':'Tap','secondary',()=>{c._tapped=!c._tapped;log(`${c._tapped?'Tapped':'Untapped'} ${c.name}`);renderGame()});add('Graveyard','secondary',()=>move(c,state.battlefield,state.graveyard,'sent to graveyard'));add('Exile','secondary',()=>move(c,state.battlefield,state.exile,'exiled'))}
+  if(zone==='commander-zone'){add('Cast to Battlefield','green',()=>{const ci=instance(state.commander,'cmd');state.battlefield.push(ci);log(`Cast commander ${state.commander.name}`);renderGame()})}
+  $('#cardDialog').showModal();
+}
+function move(c,from,to,verb){const i=from.findIndex(x=>x._instance===c._instance);if(i>=0){const [x]=from.splice(i,1);to.push(x);log(`${x.name} ${verb}`);renderGame()}}
+function startGame(){
+  if(!state.commander)return; state.life=40;state.turn=1;state.hand=[];state.battlefield=[];state.graveyard=[];state.exile=[];
+  let pool=state.deck.filter(c=>c.name!==state.commander.name || state.deck.filter(x=>x.name===state.commander.name).length>1).map((c,i)=>instance(c,i));
+  const commanderIndex=pool.findIndex(c=>c.name===state.commander.name); if(commanderIndex>=0)pool.splice(commanderIndex,1);
+  state.library=shuffle(pool); for(let i=0;i<7;i++)draw(false); $('#deckLab').style.display='none';$('#game').style.display='block';$('#modePill').textContent='TEST GAME';$('#log').innerHTML='';log(`Opening hand drawn (${state.hand.length}). ${state.commander.name} is in the command zone.`);renderGame();window.scrollTo({top:0,behavior:'smooth'});
+}
+function draw(doLog=true){if(!state.library.length){if(doLog)log('Tried to draw from an empty library');return}const c=state.library.pop();state.hand.push(c);if(doLog)log(`Drew ${c.name}`);renderGame()}
+function renderGame(){
+  $('#life').textContent=state.life;$('#turn').textContent=state.turn;$('#libraryCount').textContent=state.library.length;$('#handCount').textContent=state.hand.length;$('#graveCount').textContent=state.graveyard.length;$('#exileCount').textContent=state.exile.length;$('#handLabel').textContent=`${state.hand.length} card${state.hand.length===1?'':'s'}`;
+  const gc=$('#gameCommander');gc.innerHTML='';gc.append(cardNode(state.commander,()=>openCard(state.commander,'commander-zone')));const cm=document.createElement('div');cm.className='commander-meta';cm.innerHTML=`<strong>${state.commander.name}</strong><small>Command Zone · tap to cast</small>`;gc.append(cm);
+  const bf=$('#battlefield');bf.innerHTML='';if(!state.battlefield.length)bf.innerHTML='<div class="empty" style="grid-column:1/-1">Your battlefield is empty.</div>';else state.battlefield.forEach(c=>bf.append(cardNode(c,()=>openCard(c,'battlefield'))));
+  const h=$('#hand');h.innerHTML='';if(!state.hand.length)h.innerHTML='<div class="empty">Your hand is empty.</div>';else state.hand.forEach(c=>h.append(cardNode(c,()=>openCard(c,'hand'))));
+}
+
+$('#loadBtn').onclick=loadDeck;$('#sampleBtn').onclick=()=>{$('#deckInput').value=sample;setStatus('Sample mono-green Commander deck loaded into the text box.');};$('#clearBtn').onclick=()=>{$('#deckInput').value='';$('#loadedSummary').style.display='none';state.deck=[];state.commander=null;setStatus('Cleared.');};$('#startBtn').onclick=startGame;$('#drawBtn').onclick=()=>draw(true);$('#untapBtn').onclick=()=>{state.battlefield.forEach(c=>c._tapped=false);log('Untapped all permanents');renderGame()};$('#shuffleBtn').onclick=()=>{shuffle(state.library);log('Shuffled library')};$('#nextTurn').onclick=()=>{state.turn++;state.battlefield.forEach(c=>c._tapped=false);draw(false);log('Started a new turn, untapped, and drew a card');renderGame()};$('#backBtn').onclick=()=>{$('#game').style.display='none';$('#deckLab').style.display='block';$('#modePill').textContent='DECK LAB';window.scrollTo({top:0,behavior:'smooth'})};$('#closeModal').onclick=()=>$('#cardDialog').close();$$('[data-life]').forEach(b=>b.onclick=()=>{state.life+=Number(b.dataset.life);log(`Life total changed to ${state.life}`);renderGame()});
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(console.warn));
+</script>
+</body>
+</html>
